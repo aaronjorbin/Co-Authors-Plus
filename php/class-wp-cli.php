@@ -28,6 +28,10 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 		$users = get_users();
 		$created = 0;
 		$skipped = 0;
+		$count = count( $users );
+		
+		WP_CLI::line( "Attempting to create guest author profiles for {$count} users" );
+		$progress = \WP_CLI\Utils\make_progress_bar( 'Creating Profiles', $count );
 		foreach ( $users as $user ) {
 
 			$result = $coauthors_plus->guest_authors->create_guest_author_from_user_id( $user->ID );
@@ -36,7 +40,10 @@ class CoAuthorsPlus_Command extends WP_CLI_Command {
 			} else {
 				$created++;
 			}
+
+			$progress->tick();
 		}
+		$progress->finish();
 
 		WP_CLI::line( 'All done! Here are your results:' );
 		WP_CLI::line( "- {$created} guest author profiles were created" );
